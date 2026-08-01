@@ -675,20 +675,18 @@ const profileData = {
   about: "I build software for a living and think in systems — but I try to keep the rest of my life simple: good people, honest conversation, and time spent on things that matter. I'm looking for a partner to build a steady, warm life with, not a performance of one.",
 
   details: [
-    { label: "Date of Birth", value: formatDate(DOB_ISO) },
+    { label: "Date of Birth", value: formatDate(DOB_ISO), hidden: true },
     { label: "Age", value: calculateAge(DOB_ISO) + " Years" },
     { label: "Height", value: "166 cm (5 ft 5 in)" },
     { label: "Physical Status", value: "Normal" },
     { label: "Mother Tongue", value: "Tamil" },
     { label: "Native Place", value: "Madurai, Tamil Nadu" },
-    { label: "Education", value: "B.E. Mechanical Engineering, Velammal College of Engineering and Technology" },
-    { label: "Occupation", value: "System Engineer" },
-    { label: "Company / Sector", value: "Tata Consultancy Services (Private Sector)" },
-    { label: "Annual Income", value: "₹7 – 8 Lakhs per annum" },
-    { label: "Current Location", value: "Chennai, Tamil Nadu" },
+    { label: "Education", value: "B.E. Mechanical Engineering, Velammal College of Engineering and Technology, Madurai" },
+    { label: "Occupation", value: "System Engineer, Tata Consultancy Services, (In-Office work mode), Chennai" },
+    { label: "Annual Income", value: "₹5.5 Lakhs per annum" },
     { label: "Languages Known", value: "Tamil, English" },
-    { label: "Diet", value: "Non-vegetarian" },
-    { label: "Religious Values", value: "Attends Jummah Namaz" },
+    { label: "Diet", value: "Non-vegetarian", hidden: true },
+    { label: "Religious Values", value: "Attends Jummah Namaz", hidden: true },
     { label: "Family Type", value: "Nuclear Family, Middle Class" }
   ],
 
@@ -705,14 +703,14 @@ const profileData = {
   expectations: "",
 
   contact: [
-    { label: "Mobile (Self)", value: "+91 63806 34514", href: "tel:+916380634514" },
+    { label: "Mobile (Self)", value: "+91 63806 34514", href: "tel:+916380634514", hidden: true },
     { label: "Mobile (Mother)", value: "+91 75028 57732", href: "tel:+917502857732" },
     { label: "Email", value: "", href: "" },
     { label: "Instagram", value: "@huyyo.huyyo", href: "https://instagram.com/huyyo.huyyo" }
   ],
   contactNote: "Shared respectfully, for the purpose of marriage alliance.",
 
-  footer: "Crafted with care · " + "Sadham Hussain"
+  footer: "Crafted with care 💛 · Sadham Hussain"
 };
 
 /* ---------- Render ---------- */
@@ -750,7 +748,7 @@ document.getElementById('aboutText').textContent = profileData.about;
 if(!profileData.about) document.getElementById('about').style.display = 'none';
 
 const grid = document.getElementById('detailsGrid');
-profileData.details.filter(d => d.value && d.value !== "").forEach(d => {
+profileData.details.filter(d => d.value && d.value !== "" && !d.hidden).forEach(d => {
   const cell = el('div', 'cell');
   cell.appendChild(el('div', 'label', d.label));
   cell.appendChild(el('div', 'value', d.value));
@@ -776,7 +774,7 @@ document.getElementById('expectText').textContent = profileData.expectations;
 if(!profileData.expectations) document.getElementById('expect').style.display = 'none';
 
 const contactList = document.getElementById('contactList');
-profileData.contact.filter(c => c.value).forEach(c => {
+profileData.contact.filter(c => c.value && !c.hidden).forEach(c => {
   const row = el('div', 'contact-row');
   row.appendChild(el('div', 'contact-label', c.label));
   const a = el('a', null, c.value);

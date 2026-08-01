@@ -378,9 +378,15 @@
   .cell{
     padding:22px 20px;
     border-bottom:1px solid var(--line);
+    border-right:1px solid var(--line);
   }
-  .grid .cell:nth-child(odd){ border-right:1px solid var(--line); }
-  @media (max-width:640px){ .grid .cell:nth-child(odd){ border-right:none; } }
+  /* In two-column layout, remove right border for the second column cells */
+  .grid .cell:nth-child(2n){ border-right:none; }
+  @media (max-width:640px){
+    .grid{ grid-template-columns:1fr; }
+    /* single column: no right borders */
+    .cell{ border-right:none; }
+  }
   .cell .label{
     font-size:10.5px;
     letter-spacing:0.18em;
@@ -660,7 +666,7 @@ function calculateAge(dobISO){
 }
 function formatDate(dobISO){
   const dob = new Date(dobISO);
-  return dob.toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' });
+  return dob.toLocaleDateString('en-IN', { month:'short', year:'numeric' });
 }
 
 const DOB_ISO = "1998-09-12"; // 12-Sept-1998 — age recalculates automatically on every visit
@@ -675,10 +681,10 @@ const profileData = {
   about: "I build software for a living and think in systems — but I try to keep the rest of my life simple: good people, honest conversation, and time spent on things that matter. I'm looking for a partner to build a steady, warm life with, not a performance of one.",
 
   details: [
-    { label: "Date of Birth", value: formatDate(DOB_ISO), hidden: true },
+    { label: "Date of Birth", value: formatDate(DOB_ISO) },
     { label: "Age", value: calculateAge(DOB_ISO) + " Years" },
     { label: "Height", value: "166 cm (5 ft 5 in)" },
-    { label: "Physical Status", value: "Normal" },
+    { label: "Physical Status", value: "Normal", hidden: true },
     { label: "Mother Tongue", value: "Tamil" },
     { label: "Native Place", value: "Madurai, Tamil Nadu" },
     { label: "Education", value: "B.E. Mechanical Engineering, Velammal College of Engineering and Technology, Madurai" },

@@ -404,25 +404,35 @@
   /* ---------- Family list ---------- */
   .family-list{ list-style:none; padding:0; margin:0; }
   .family-list li{
-    display:flex;
-    justify-content:space-between;
-    align-items:baseline;
+    display:grid;
+    grid-template-columns: 1fr 1fr 1fr;
     gap:16px;
-    padding:20px 0;
+    padding:16px 0;
     border-bottom:1px solid var(--line);
+    align-items:center;
   }
   .family-list li:first-child{ border-top:1px solid var(--line); }
-  .family-list .rel{
+  .family-list .role{
     font-size:11px;
-    letter-spacing:0.16em;
+    letter-spacing:0.12em;
     text-transform:uppercase;
     color:var(--muted);
-    white-space:nowrap;
   }
-  .family-list .who{
+  .family-list .name{
     font-family:var(--serif);
-    font-size:19px;
+    font-size:18px;
+    text-align:left;
+  }
+  .family-list .job{
+    font-size:13px;
+    color:var(--muted);
     text-align:right;
+  }
+  .family-paragraph ul{ margin:0; padding-left:18px; }
+  .family-paragraph .family-name{ font-weight:700; color:var(--brass); margin:0 6px; font-style:italic; }
+  @media (max-width:640px){
+    .family-list li{ grid-template-columns: 1fr; gap:6px; padding:12px 0; }
+    .family-list .job{ text-align:left; }
   }
 
   /* ---------- Interests / tags ---------- */
@@ -599,6 +609,7 @@
     <div class="rule"></div>
   </div>
   <p class="about-text reveal" id="aboutText"></p>
+  <p class="about-text reveal" id="aboutText2"></p>
 </section>
 
 <section class="band" id="details">
@@ -617,6 +628,9 @@
     <h2>Family</h2>
   </div>
   <ul class="family-list reveal" id="familyList"></ul>
+  <div id="familyParagraph" class="reveal family-paragraph">
+    <p id="familyParagraphText"></p>
+  </div>
 </section>
 
 <section class="band" id="life" style="display:none">
@@ -679,6 +693,7 @@ const profileData = {
   heroMeta: [calculateAge(DOB_ISO) + " Years", "Chennai, Tamil Nadu"],
 
   about: "I build software for a living and think in systems — but I try to keep the rest of my life simple: good people, honest conversation, and time spent on things that matter. I'm looking for a partner to build a steady, warm life with, not a performance of one.",
+  about2: "I'm a little playful and love the theatrical experience of watching movies. I feel relaxed, happy, and joyous when spending quality time with my family and friends. I value a simple and practical way of life.",
 
   details: [
     { label: "Date of Birth", value: formatDate(DOB_ISO) },
@@ -687,9 +702,9 @@ const profileData = {
     { label: "Physical Status", value: "Normal", hidden: true },
     { label: "Mother Tongue", value: "Tamil" },
     { label: "Native Place", value: "Madurai, Tamil Nadu" },
-    { label: "Education", value: "B.E. Mechanical Engineering, Velammal College of Engineering and Technology, Madurai" },
+    { label: "Education", value: "B.E. Mechanical Engineering, Velammal College of Engineering and Technology, Madurai (Batch 2016 - 2020)" },
     { label: "Occupation", value: "System Engineer, Tata Consultancy Services, (In-Office work mode), Chennai" },
-    { label: "Annual Income", value: "₹5.5 Lakhs per annum" },
+    { label: "Annual Income", value: "₹7.2 Lakhs per annum" },
     { label: "Languages Known", value: "Tamil, English" },
     { label: "Diet", value: "Non-vegetarian", hidden: true },
     { label: "Religious Values", value: "Attends Jummah Namaz", hidden: true },
@@ -697,11 +712,11 @@ const profileData = {
   ],
 
   family: [
-    { rel: "Father", who: "Mohamed Ismail — Employed" },
-    { rel: "Mother", who: "Nilofer Nisha — Homemaker" },
-    { rel: "Elder Sister", who: "Sabena — Married" },
-    { rel: "Younger Brother", who: "Sheik Mohamed — Unmarried" },
-    { rel: "Family Values", who: "" }
+    { role: "Father", name: "Mohamed Ismail", job: "Employed" },
+    { role: "Mother", name: "Nilofer Nisha", job: "Homemaker" },
+    { role: "Elder Sister", name: "Sabena", job: "Married" },
+    { role: "Younger Brother", name: "Sheik Mohamed", job: "Unmarried" },
+    { role: "Family Values", name: "", job: "" }
   ],
 
   interests: ["Theatre", "Pets", "Chinese Cuisine"],
@@ -709,7 +724,7 @@ const profileData = {
   expectations: "",
 
   contact: [
-    { label: "Mobile (Self)", value: "+91 63806 34514", href: "tel:+916380634514", hidden: true },
+    { label: "Mobile (Self)", value: "+91 63806 34514", href: "tel:+916380634514" },
     { label: "Mobile (Mother)", value: "+91 75028 57732", href: "tel:+917502857732" },
     { label: "Email", value: "", href: "" },
     { label: "Instagram", value: "@huyyo.huyyo", href: "https://instagram.com/huyyo.huyyo" }
@@ -751,7 +766,15 @@ profileData.heroMeta.filter(Boolean).forEach((m, i, arr) => {
 });
 
 document.getElementById('aboutText').textContent = profileData.about;
+document.getElementById('aboutText').textContent = profileData.about;
 if(!profileData.about) document.getElementById('about').style.display = 'none';
+
+// Second stanza for the About/Essence section
+const aboutText2El = document.getElementById('aboutText2');
+if(aboutText2El){
+  aboutText2El.textContent = profileData.about2 || '';
+  if(!profileData.about2) aboutText2El.style.display = 'none';
+}
 
 const grid = document.getElementById('detailsGrid');
 profileData.details.filter(d => d.value && d.value !== "" && !d.hidden).forEach(d => {
@@ -762,14 +785,87 @@ profileData.details.filter(d => d.value && d.value !== "" && !d.hidden).forEach(
 });
 
 const famList = document.getElementById('familyList');
-profileData.family.filter(f => f.who && f.who !== "—").forEach(f => {
+profileData.family.filter(f => (f.role || f.rel) && (f.name || f.who || f.job)).forEach(f => {
   const li = el('li');
-  li.appendChild(el('span', 'rel', f.rel));
-  li.appendChild(el('span', 'who', f.who));
+  const role = f.role || f.rel || '';
+  let name = f.name || '';
+  let job = f.job || '';
+  if(!name && f.who && typeof f.who === 'string'){
+    const parts = f.who.split(' — ');
+    name = parts[0] || '';
+    job = parts[1] || '';
+  }
+  li.appendChild(el('span', 'role', role));
+  li.appendChild(el('span', 'name', name));
+  li.appendChild(el('span', 'job', job));
   famList.appendChild(li);
 });
 if(!famList.children.length){
   document.getElementById('family').style.display = 'none';
+}
+
+// Hide the family list and show the provided family details as bullets
+const familyParagraphBullets = [
+  { role: 'My Amma', name: 'Nilofer Nisha', desc: 'is a homemaker.' },
+  { role: 'My Aththa', name: 'Mohamed Ismail', desc: 'is employed at a betel shop and works as a tricycle loadman.' },
+  { role: 'My Akka', name: 'Sabena', desc: 'is a B.Com. graduate; married and settled in Madurai with her husband and child. My Machan, Mohd Ismail, works at Niwas Finance, Madurai. My Maaplillai, Mohd Idris, just turned one.' },
+  { role: 'My Thambi', name: 'Sheik Mohamed', desc: 'is a B.Sc. Mathematics graduate and is currently working with DXC Technology (Work from home mode).' }
+];
+const familyListEl = document.getElementById('familyList');
+if (familyListEl) familyListEl.style.display = 'none';
+const fpEl = document.getElementById('familyParagraphText');
+if (fpEl) {
+  const ul = document.createElement('ul');
+  ul.style.margin = '0';
+  ul.style.paddingLeft = '18px';
+  familyParagraphBullets.forEach(item => {
+    const li = document.createElement('li');
+    const roleNode = document.createTextNode(item.role + ', ');
+    const nameSpan = document.createElement('span');
+    nameSpan.className = 'family-name';
+    nameSpan.textContent = item.name;
+
+    // Build description fragment and highlight additional names if present
+    function buildDescFragment(desc, extraNames){
+      const frag = document.createDocumentFragment();
+      let remaining = desc;
+      while(remaining.length){
+        let earliestIndex = -1;
+        let matchName = null;
+        for(const n of extraNames){
+          const idx = remaining.indexOf(n);
+          if(idx >= 0 && (earliestIndex === -1 || idx < earliestIndex)){
+            earliestIndex = idx;
+            matchName = n;
+          }
+        }
+        if(earliestIndex === -1){
+          frag.appendChild(document.createTextNode(remaining));
+          break;
+        }
+        if(earliestIndex > 0){
+          frag.appendChild(document.createTextNode(remaining.slice(0, earliestIndex)));
+        }
+        const span = document.createElement('span');
+        span.className = 'family-name';
+        span.textContent = matchName;
+        frag.appendChild(span);
+        remaining = remaining.slice(earliestIndex + matchName.length);
+      }
+      return frag;
+    }
+
+    // common extra names to highlight
+    const extras = ['Mohd Ismail', 'Mohd Idris'];
+    const descFrag = buildDescFragment(' ' + item.desc, extras);
+
+    li.appendChild(roleNode);
+    li.appendChild(nameSpan);
+    li.appendChild(descFrag);
+    ul.appendChild(li);
+  });
+  fpEl.innerHTML = '';
+  fpEl.appendChild(ul);
 }
 
 const tagWrap = document.getElementById('interestTags');
@@ -795,7 +891,9 @@ document.getElementById('footerText').textContent = profileData.footer;
 /* ---------- Gallery carousel ---------- */
 const fallbackImages = [
   'images/1.jpeg',
-  'images/2.jpeg'
+  'images/2.jpeg',
+  'images/3.jpeg',
+  'images/4.jpeg'
 ];
 const driveFolderUrl = 'https://drive.google.com/drive/folders/1tzkF_5bB1UbH2nwKGdxExtQY64He9HaA';
 const carouselTrack = document.getElementById('carouselTrack');
